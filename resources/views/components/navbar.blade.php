@@ -93,7 +93,7 @@
 </nav>
 
 @push('styles')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaiu8w/5mhw5/f+wP7/R7t0/0s4l/z0c/b/g9n/8357+eQ9+f/Xh8+K//w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous">
 <style>
     .navbar {
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
