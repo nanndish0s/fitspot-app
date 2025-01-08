@@ -32,7 +32,6 @@
                             <h3 class="text-2xl font-bold text-gray-900">{{ $trainer->user->name }}</h3>
                             <div class="text-gray-700">
                                 <p><span class="font-semibold">Specialization:</span> {{ $trainer->specialization }}</p>
-                                <p><span class="font-semibold">Hourly Rate:</span> LKR {{ number_format($trainer->hourly_rate, 2) }}</p>
                                 <p><span class="font-semibold">Bio:</span> {{ $trainer->bio }}</p>
                             </div>
                         </div>
@@ -54,18 +53,26 @@
                                         </div>
                                     </div>
                                     @auth
-                                        <div class="mt-4 text-right">
+                                        <div class="mt-4 text-right flex justify-end space-x-4">
                                             <a href="{{ route('bookings.create', ['service_id' => $service->id]) }}" 
                                                class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-black rounded-md font-semibold text-xs text-black uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                                                 Book This Service
                                             </a>
+                                            <button data-test="chat-with-trainer" x-data x-on:click="$dispatch('open-chat', { trainerId: {{ $trainer->user->id }} })"
+                                               class="inline-flex items-center px-4 py-2 bg-green-600 border border-black rounded-md font-semibold text-xs text-black uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                                Chat with Trainer
+                                            </button>
                                         </div>
                                     @else
-                                        <div class="mt-4 text-right">
-                                            <a href="{{ route('login') }}" 
-                                               class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                                Login to Book
+                                        <div class="mt-4 text-right flex justify-end space-x-4">
+                                            <a href="{{ route('bookings.create', ['service_id' => $service->id]) }}" 
+                                               class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-black rounded-md font-semibold text-xs text-black uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                                Book This Service
                                             </a>
+                                            <button x-data x-on:click="$dispatch('open-chat', { trainerId: {{ $trainer->user->id }} })"
+                                               class="inline-flex items-center px-4 py-2 bg-green-600 border border-black rounded-md font-semibold text-xs text-black uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                                Chat with Trainer
+                                            </button>
                                         </div>
                                     @endauth
                                 </div>

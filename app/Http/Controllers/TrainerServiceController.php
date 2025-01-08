@@ -27,8 +27,9 @@ class TrainerServiceController extends Controller
                 'description' => 'required|string',
                 'price' => 'required|numeric|min:0',
                 'location' => 'required|string|max:255',
-                'latitude' => 'nullable|numeric|between:-90,90',
-                'longitude' => 'nullable|numeric|between:-180,180',
+                'latitude' => 'required|numeric|between:-90,90',
+                'longitude' => 'required|numeric|between:-180,180',
+                'location_address' => 'required|string|max:500',
                 'service_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
 
@@ -67,8 +68,9 @@ class TrainerServiceController extends Controller
                 'description' => $validated['description'],
                 'price' => $validated['price'],
                 'location' => $validated['location'],
-                'latitude' => $validated['latitude'] ?? 0,
-                'longitude' => $validated['longitude'] ?? 0,
+                'latitude' => $validated['latitude'],
+                'longitude' => $validated['longitude'],
+                'location_address' => $validated['location_address'],
                 'image' => $imagePath
             ];
 

@@ -53,6 +53,11 @@ class User extends Authenticatable
         return $this->hasOne(Trainer::class);
     }
 
+    public function wishlist()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
     public function products()
     {
         return $this->hasMany(Product::class, 'user_id');

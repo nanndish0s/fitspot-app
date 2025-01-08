@@ -34,10 +34,20 @@
                 @if(auth()->user()->role === 'seller')
                     <a href="/seller/dashboard" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"><i class="fas fa-store me-1"></i>Seller Dashboard</a>
                 @endif
-                <form action="{{ route('logout') }}" method="POST" class="inline">
-                    @csrf
-                    <button type="submit" class="text-white px-4 py-2 bg-red-500 rounded hover:bg-red-600"><i class="fas fa-sign-out-alt me-1"></i>Logout</button>
-                </form>
+                <div class="relative">
+                    <button data-cy="profile-dropdown" class="nav-link">
+                        <i class="fas fa-user me-1"></i>Profile
+                    </button>
+                    <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+                        <a href="{{ route('orders.index') }}" data-cy="view-bookings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View Bookings</a>
+                        <form action="{{ route('logout') }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
             @else
                 <a href="/login" class="nav-link"><i class="fas fa-sign-in-alt me-1"></i>Login</a>
                 <a href="/register" class="bg-white text-green-600 px-4 py-2 rounded hover:bg-gray-100"><i class="fas fa-user-plus me-1"></i>Register</a>
@@ -58,5 +68,31 @@
 
     hamburger.addEventListener('click', () => {
         mobileMenu.classList.toggle('hidden');
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileDropdown = document.querySelector('[data-cy="profile-dropdown"]');
+        const dropdownMenu = profileDropdown?.nextElementSibling;
+
+        if (profileDropdown && dropdownMenu) {
+            // Initially hide the dropdown
+            dropdownMenu.style.display = 'none';
+
+            // Toggle dropdown on click
+            profileDropdown.addEventListener('click', function(e) {
+                e.preventDefault();
+                const isHidden = dropdownMenu.style.display === 'none';
+                dropdownMenu.style.display = isHidden ? 'block' : 'none';
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!profileDropdown.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    dropdownMenu.style.display = 'none';
+                }
+            });
+        }
     });
 </script>

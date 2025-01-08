@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Trainer; // This imports the Trainer model
-
-
+use App\Models\ChatMessage; // This imports the ChatMessage model
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -60,7 +59,35 @@ public function dashboard()
     // Get the trainer's services
     $services = $trainer ? $trainer->services : collect();
 
-    return view('trainers.dashboard', compact('trainer', 'services'));
+    // Get recent chats with users
+    $chats = ChatMessage::where('receiver_id', auth()->id())
+        ->orWhere('sender_id', auth()->id())
+        ->with(['sender', 'receiver'])
+        ->get()
+        // Group conversations by the other user
+        ->groupBy(function($message) {
+            return $message->sender_id === auth()->id() 
+                ? $message->receiver_id 
+                : $message->sender_id;
+        })
+        // Get the most recent message for each conversation
+        ->map(function($conversationMessages) {
+            $lastMessage = $conversationMessages->sortByDesc('created_at')->first();
+            $otherUser = $lastMessage->sender_id === auth()->id() 
+                ? $lastMessage->receiver 
+                : $lastMessage->sender;
+            
+            return (object)[
+                'user' => $otherUser,
+                'last_message' => $lastMessage->message,
+                'created_at' => $lastMessage->created_at
+            ];
+        })
+        // Sort conversations by the most recent message
+        ->sortByDesc('created_at')
+        ->values();
+
+    return view('trainers.dashboard', compact('trainer', 'services', 'chats'));
 }
 
 public function addService(Request $request)
@@ -157,6 +184,11 @@ public function addService(Request $request)
     // Show public trainer profile
     public function showProfile(Trainer $trainer)
     {
+        // Ensure the user is authenticated
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Please log in to view trainer profiles.');
+        }
+
         $trainer->load(['user', 'services']);
         return view('trainers.profile', compact('trainer'));
     }

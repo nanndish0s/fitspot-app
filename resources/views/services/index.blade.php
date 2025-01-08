@@ -53,14 +53,67 @@
 
                             <!-- Price Range -->
                             <div class="space-y-2">
-                                <label for="price_range" class="block text-sm font-medium text-gray-700">Price Range</label>
+                                <label for="price_range" class="block text-sm font-medium text-gray-700 flex items-center">
+                                    <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Price Range
+                                </label>
                                 <select id="price_range" name="price_range" 
                                         class="w-full border border-gray-200 rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 hover:shadow-md bg-white/50 backdrop-blur-sm"
                                         aria-label="Select price range">
                                     <option value="">Any Price</option>
                                     <option value="0-1000" {{ ($filters['price_range'] ?? '') == '0-1000' ? 'selected' : '' }}>Under LKR 1,000</option>
                                     <option value="1000-2000" {{ ($filters['price_range'] ?? '') == '1000-2000' ? 'selected' : '' }}>LKR 1,000 - 2,000</option>
-                                    <option value="2000+" {{ ($filters['price_range'] ?? '') == '2000+' ? 'selected' : '' }}>Above LKR 2,000</option>
+                                    <option value="2000+" {{ ($filters['price_range'] ?? '') == '2000+' ? 'selected' : '' }}>Over LKR 2,000</option>
+                                </select>
+                            </div>
+
+                            <!-- Location Filter -->
+                            <div class="space-y-2">
+                                <label for="location" class="block text-sm font-medium text-gray-700 flex items-center">
+                                    <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    Location
+                                </label>
+                                <div class="relative">
+                                    <input type="text" 
+                                           id="location" 
+                                           name="location" 
+                                           value="{{ $filters['location'] ?? '' }}"
+                                           placeholder="Enter location or use current location" 
+                                           class="w-full border border-gray-200 rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 hover:shadow-md bg-white/50 backdrop-blur-sm">
+                                    <button type="button" 
+                                            id="getCurrentLocation" 
+                                            class="absolute right-2 top-1/2 transform -translate-y-1/2 text-indigo-500 hover:text-indigo-600"
+                                            title="Use current location">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C7.03 2 3 6.03 3 11c0 3.09 1.55 5.85 3.92 7.5C8.35 19.65 10.1 20 12 20s3.65-.35 5.08-1.5C19.45 16.85 21 14.09 21 11c0-4.97-4.03-9-9-9z"></path>
+                                        </svg>
+                                    </button>
+                                    <input type="hidden" id="latitude" name="latitude" value="{{ $filters['latitude'] ?? '' }}">
+                                    <input type="hidden" id="longitude" name="longitude" value="{{ $filters['longitude'] ?? '' }}">
+                                </div>
+                            </div>
+
+                            <!-- Distance Range -->
+                            <div class="space-y-2">
+                                <label for="distance" class="block text-sm font-medium text-gray-700 flex items-center">
+                                    <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                                    </svg>
+                                    Distance Range
+                                </label>
+                                <select id="distance" name="distance" 
+                                        class="w-full border border-gray-200 rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 hover:shadow-md bg-white/50 backdrop-blur-sm">
+                                    <option value="">Any Distance</option>
+                                    <option value="5" {{ ($filters['distance'] ?? '') == '5' ? 'selected' : '' }}>Within 5 km</option>
+                                    <option value="10" {{ ($filters['distance'] ?? '') == '10' ? 'selected' : '' }}>Within 10 km</option>
+                                    <option value="20" {{ ($filters['distance'] ?? '') == '20' ? 'selected' : '' }}>Within 20 km</option>
+                                    <option value="50" {{ ($filters['distance'] ?? '') == '50' ? 'selected' : '' }}>Within 50 km</option>
                                 </select>
                             </div>
 
@@ -75,26 +128,6 @@
                                     <option value="price_high">Price: High to Low</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <!-- Location Filter -->
-                        <div class="space-y-2">
-                            <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
-                            <select id="location" name="location" 
-                                    class="w-full border border-gray-200 rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 hover:shadow-md bg-white/50 backdrop-blur-sm"
-                                    aria-label="Select location">
-                                <option value="all">All Locations</option>
-                                <option value="Colombo" {{ ($filters['location'] ?? '') == 'Colombo' ? 'selected' : '' }}>Colombo</option>
-                                <option value="Kandy" {{ ($filters['location'] ?? '') == 'Kandy' ? 'selected' : '' }}>Kandy</option>
-                                <option value="Galle" {{ ($filters['location'] ?? '') == 'Galle' ? 'selected' : '' }}>Galle</option>
-                                <option value="Jaffna" {{ ($filters['location'] ?? '') == 'Jaffna' ? 'selected' : '' }}>Jaffna</option>
-                                <option value="Negombo" {{ ($filters['location'] ?? '') == 'Negombo' ? 'selected' : '' }}>Negombo</option>
-                                <option value="Batticaloa" {{ ($filters['location'] ?? '') == 'Batticaloa' ? 'selected' : '' }}>Batticaloa</option>
-                                <option value="Trincomalee" {{ ($filters['location'] ?? '') == 'Trincomalee' ? 'selected' : '' }}>Trincomalee</option>
-                                <option value="Anuradhapura" {{ ($filters['location'] ?? '') == 'Anuradhapura' ? 'selected' : '' }}>Anuradhapura</option>
-                                <option value="Matara" {{ ($filters['location'] ?? '') == 'Matara' ? 'selected' : '' }}>Matara</option>
-                                <option value="Kurunegala" {{ ($filters['location'] ?? '') == 'Kurunegala' ? 'selected' : '' }}>Kurunegala</option>
-                            </select>
                         </div>
 
                         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -142,6 +175,15 @@
                                 <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition duration-300 focus:outline-none focus:text-indigo-600" tabindex="0">{{ $service->service_name }}</h3>
                                 <p class="text-gray-600 text-sm line-clamp-2 mb-3" aria-label="Service description">{{ $service->description }}</p>
                                 
+                                @if(isset($service->distance))
+                                <div class="flex items-center text-sm text-gray-500 mb-2">
+                                    <svg class="w-4 h-4 mr-1 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    <span>{{ number_format($service->distance, 1) }} km away</span>
+                                </div>
+                                @endif
                                 <!-- Service Highlights -->
                                 <div class="flex flex-wrap gap-2 mb-4">
                                     @if($service->duration)
@@ -190,6 +232,25 @@
                                aria-label="Book {{ $service->service_name }} service now">
                                 Book Now
                             </a>
+                            @if($service->trainerService)
+                                <div class="flex items-center justify-between mt-4">
+                                    <span class="text-lg font-bold text-primary">
+                                        ${{ number_format($service->trainerService->price, 2) }}
+                                    </span>
+                                    <div class="flex space-x-2">
+                                        <form action="{{ route('wishlist.store') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="service_id" value="{{ $service->trainerService->id }}">
+                                            <button type="submit" class="bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300 transition">
+                                                <i class="fas fa-heart mr-1"></i> Add to Wishlist
+                                            </button>
+                                        </form>
+                                        <a href="{{ route('services.book', $service->trainerService->id) }}" class="bg-primary text-white px-3 py-1 rounded hover:bg-primary-dark transition">
+                                            Book Now
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div> 
                 @endforeach
@@ -234,3 +295,65 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const getCurrentLocationBtn = document.getElementById('getCurrentLocation');
+        const locationInput = document.getElementById('location');
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
+
+        if (getCurrentLocationBtn) {
+            getCurrentLocationBtn.addEventListener('click', function() {
+                console.log('Location button clicked'); // Debug log
+                if ("geolocation" in navigator) {
+                    getCurrentLocationBtn.disabled = true;
+                    getCurrentLocationBtn.classList.add('opacity-50');
+                    
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            console.log('Got position:', position); // Debug log
+                            const latitude = position.coords.latitude;
+                            const longitude = position.coords.longitude;
+                            
+                            // Set the hidden inputs
+                            latitudeInput.value = latitude;
+                            longitudeInput.value = longitude;
+                            
+                            // Reverse geocode to get address
+                            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    console.log('Got address:', data); // Debug log
+                                    locationInput.value = data.display_name;
+                                })
+                                .catch(error => {
+                                    console.error('Error getting address:', error);
+                                    locationInput.value = `${latitude}, ${longitude}`;
+                                })
+                                .finally(() => {
+                                    getCurrentLocationBtn.disabled = false;
+                                    getCurrentLocationBtn.classList.remove('opacity-50');
+                                });
+                        },
+                        function(error) {
+                            console.error('Geolocation error:', error); // Debug log
+                            alert('Unable to get your location. Please enter it manually.');
+                            getCurrentLocationBtn.disabled = false;
+                            getCurrentLocationBtn.classList.remove('opacity-50');
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 5000,
+                            maximumAge: 0
+                        }
+                    );
+                } else {
+                    alert('Geolocation is not supported by your browser');
+                }
+            });
+        } else {
+            console.error('Location button not found'); // Debug log
+        }
+    });
+</script>

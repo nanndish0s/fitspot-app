@@ -34,6 +34,32 @@ class ServicesController extends Controller
             });
         }
 
+        // Location and Distance filter
+        if ($request->filled(['latitude', 'longitude'])) {
+            $lat = $request->latitude;
+            $lng = $request->longitude;
+            $distance = $request->filled('distance') ? $request->distance : 50; // Default to 50km if not specified
+
+            // Always calculate distance when coordinates are provided
+            $query->selectRaw("
+                *,
+                ROUND(
+                    (6371 * acos(
+                        cos(radians(?)) * cos(radians(latitude)) *
+                        cos(radians(longitude) - radians(?)) +
+                        sin(radians(?)) * sin(radians(latitude))
+                    ))::numeric, 1
+                ) AS distance", [$lat, $lng, $lat]);
+
+            // Only filter by distance if a specific range is selected
+            if ($request->filled('distance')) {
+                $query->having('distance', '<=', $distance);
+            }
+
+            // Always order by distance when coordinates are provided
+            $query->orderBy('distance');
+        }
+
         // Location filter
         if ($request->filled('location') && $request->location !== 'all') {
             $query->where('location', $request->location);

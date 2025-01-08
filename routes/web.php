@@ -13,6 +13,9 @@ use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\GymController;
+use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\ForumController;
 
 
 
@@ -91,6 +94,11 @@ Route::middleware('auth')->group(function () {
 // });
 
 Route::middleware(['auth'])->group(function () {
+    // Wishlist Routes
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist', [WishlistController::class, 'store'])->name('wishlist.store');
+    Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
+
     // Trainer dashboard route with role check
     Route::get('/trainer/dashboard', [TrainerController::class, 'dashboard'])->name('trainer.dashboard');
     // Route to show the form to create a trainer profile
@@ -115,7 +123,9 @@ Route::middleware(['auth'])->group(function () {
 // Public routes for viewing trainer services
 Route::get('/services', [ServicesController::class, 'index'])->name('services.index');
 Route::get('/services/{service}', [ServicesController::class, 'show'])->name('services.show');
-Route::get('/trainers/{trainer}', [TrainerController::class, 'showProfile'])->name('trainers.profile');
+Route::middleware('auth')->group(function () {
+    Route::get('/trainers/{trainer}', [TrainerController::class, 'showProfile'])->name('trainers.profile');
+});
 
 // Booking routes
 Route::middleware(['auth'])->group(function () {
@@ -137,8 +147,23 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 
+// Gym routes
+Route::get('/gyms/nearby', [GymController::class, 'index'])->name('gyms.nearby');
+Route::get('/nearby-gyms', [GymController::class, 'nearbyGyms'])->name('gyms.nearby.data');
+
 // Product Reviews
 Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+// Forum Routes
+Route::prefix('forum')->name('forum.')->group(function () {
+    Route::get('/', [ForumController::class, 'index'])->name('index');
+    Route::get('/create', [ForumController::class, 'create'])->name('create')->middleware('auth');
+    Route::post('/store', [ForumController::class, 'store'])->name('store')->middleware('auth');
+    Route::get('/{id}', [ForumController::class, 'show'])->name('show');
+    Route::post('/{postId}/comment', [ForumController::class, 'addComment'])->name('comment')->middleware('auth');
+    Route::post('/{postId}/like', [ForumController::class, 'toggleLike'])->name('like')->middleware('auth');
+    Route::delete('/{id}', [ForumController::class, 'destroy'])->name('destroy')->middleware('auth');
+});
 
 require __DIR__.'/auth.php';

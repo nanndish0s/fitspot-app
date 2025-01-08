@@ -25,10 +25,19 @@
                         </div>
                         <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
                             <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-outline-secondary">View</a>
-                            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                <button type="submit" class="btn btn-sm btn-success">Add to Cart</button>
-                            </form>
+                            <div class="d-flex align-items-center">
+                                <form action="{{ route('wishlist.store') }}" method="POST" class="me-2" onsubmit="return handleWishlistSubmit(event)">
+                                    @csrf
+                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-heart me-1"></i> Wishlist
+                                    </button>
+                                </form>
+                                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-success">Add to Cart</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -71,5 +80,50 @@
         </div>
     </div>
 </footer>
+
+@section('scripts')
+<script>
+    function handleWishlistSubmit(event) {
+        event.preventDefault();
+        
+        const form = event.target;
+        const formData = new FormData(form);
+
+        console.log('Wishlist Form Submission:', {
+            action: form.action,
+            method: form.method,
+            data: Object.fromEntries(formData)
+        });
+
+        fetch(form.action, {
+            method: form.method,
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': formData.get('_token')
+            }
+        })
+        .then(response => {
+            console.log('Wishlist Response:', response);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Wishlist Response Data:', data);
+            // Redirect to wishlist page on successful addition
+            if (data.success) {
+                window.location.href = "{{ route('wishlist.index') }}";
+            } else if (data.error) {
+                alert(data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Wishlist Error:', error);
+            alert('An error occurred while adding to wishlist');
+        });
+
+        return false;
+    }
+</script>
+@endsection
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
