@@ -6,8 +6,6 @@ use App\Models\Cart;     // Import the Cart model
 use Illuminate\Support\Facades\Auth;  // <-- Import the Auth facade
 use App\Models\CartItem;
 
-
-
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -56,14 +54,52 @@ class CartController extends Controller
 
     public function removeFromCart($id)
     {
-        // Find the cart item using the Cart model
-        $cartItem = Cart::findOrFail($id);
-    
-        // Delete the cart item
-        $cartItem->delete();
-    
-        // Redirect back to the cart with a success message
-        return redirect()->route('cart')->with('success', 'Item removed from the cart.');
+        \Log::info('Attempting to remove cart item', [
+            'cart_item_id' => $id,
+            'user_id' => auth()->id()
+        ]);
+
+        try {
+            // Find the cart item using the Cart model
+            $cartItem = Cart::where('id', $id)
+                            ->where('user_id', auth()->id())
+                            ->first();
+
+            // Log details about the found cart item
+            if (!$cartItem) {
+                \Log::warning('Cart item not found', [
+                    'cart_item_id' => $id,
+                    'current_user_id' => auth()->id()
+                ]);
+                return redirect()->route('cart')->with('error', 'Cart item not found.');
+            }
+
+            \Log::info('Cart item found', [
+                'cart_item_details' => $cartItem->toArray()
+            ]);
+
+            // Delete the cart item
+            $result = $cartItem->delete();
+
+            \Log::info('Cart item removal result', [
+                'deleted' => $result,
+                'cart_item_id' => $id
+            ]);
+
+            // Redirect back to the cart with a success message
+            return redirect()->route('cart')->with('success', 'Item removed from the cart.');
+        } catch (\Exception $e) {
+            // Log the full error details
+            \Log::error('Cart removal error', [
+                'error_message' => $e->getMessage(),
+                'error_trace' => $e->getTraceAsString(),
+                'cart_item_id' => $id,
+                'user_id' => auth()->id()
+            ]);
+            
+            // Redirect back with an error message
+            return redirect()->route('cart')->with('error', 'Unable to remove item from cart: ' . $e->getMessage());
+        }
     }
     
 

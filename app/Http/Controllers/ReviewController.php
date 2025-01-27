@@ -20,13 +20,25 @@ class ReviewController extends BaseController
             'product_id' => $product->id,
             'user_id' => auth()->id(),
             'rating' => $request->rating,
-            'comment' => $request->comment
+            'comment' => $request->comment,
+            'all_request_data' => $request->all(),
+            'is_authenticated' => auth()->check()
         ]);
 
-        $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'required|string|min:10',
-        ]);
+        try {
+            $request->validate([
+                'rating' => 'required|integer|min:1|max:5',
+                'comment' => 'required|string|min:10',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Review Validation Failed', [
+                'errors' => $e->errors(),
+                'product_id' => $product->id,
+                'user_id' => auth()->id()
+            ]);
+
+            return back()->withErrors($e->validator)->withInput();
+        }
 
         try {
             $review = new Review([

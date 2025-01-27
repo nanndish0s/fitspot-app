@@ -9,8 +9,12 @@ class OrderController extends Controller
 {
     public function index()
     {
-        // Fetch the logged-in user's orders with their items and products
-        $orders = auth()->user()->orders()->with(['orderItems.product'])->latest()->get();
+        // Fetch the logged-in user's orders with their items and products, paginated
+        $orders = auth()->user()
+            ->orders()
+            ->with(['orderItems.product'])
+            ->latest()
+            ->paginate(5);  // 5 orders per page
 
         return view('orders.index', compact('orders'));
     }

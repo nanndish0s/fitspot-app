@@ -96,3 +96,33 @@
         </div>
     </div>
 </x-app-layout>
+
+<div class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>FitSpot</h5>
+                <p>Your ultimate destination for fitness and wellness.</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{{ route('services.index') }}" class="text-white-50">Services</a></li>
+                    <li><a href="{{ route('products.index') }}" class="text-white-50">Products</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Connect With Us</h5>
+                <div class="social-links">
+                    <a href="#" class="text-white-50 me-3"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-white-50 me-3"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white-50"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4 bg-white">
+        <div class="text-center">
+            <p>&copy; 2024 FitSpot. All Rights Reserved.</p>
+        </div>
+    </div>
+</div>

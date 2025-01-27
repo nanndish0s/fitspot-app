@@ -115,4 +115,21 @@ class ServicesController extends Controller
             ]
         ]);
     }
+
+    public function show(TrainerService $service)
+    {
+        // Eager load related trainer and user details
+        $service->load(['trainer.user', 'trainer.services']);
+
+        // Get related services from the same trainer
+        $relatedServices = $service->trainer->services()
+            ->where('id', '!=', $service->id)
+            ->limit(3)
+            ->get();
+
+        return view('services.show', [
+            'service' => $service,
+            'relatedServices' => $relatedServices
+        ]);
+    }
 }

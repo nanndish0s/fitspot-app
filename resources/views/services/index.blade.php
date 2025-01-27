@@ -1,15 +1,35 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-center items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight text-center">
+            {{-- <h2 class="font-semibold text-xl text-gray-800 leading-tight text-center">
                 {{ __('Our Services') }}
-            </h2>
+            </h2> --}}
         </div>
     </x-slot>
+    <div class="bg-gradient-to-br from-indigo-600 to-purple-700 text-white py-16 mb-8">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <div class="flex justify-center mb-6">
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+                    Transform Your Fitness Journey
+                </h1>
+                <p class="text-xl md:text-2xl mb-6 text-white/90 leading-relaxed">
+                    Discover personalized training services tailored to your fitness goals. 
+                    From weight training to yoga, find the perfect trainer to elevate your wellness.
+                </p>
+                <div class="flex justify-center space-x-4">
+                    <a href="#services-grid" class="px-6 py-3 bg-white text-indigo-600 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition duration-300">
+                        Explore Services
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="py-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-white min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Search and Filter Section -->
-            <div class="mb-8 mt-8 bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+            <div id="services-grid" class="mb-8 mt-8 bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                 <div class="p-6">
                     <form action="{{ route('services.index') }}" method="GET" class="space-y-6">
                         <!-- Search Bar -->
@@ -55,7 +75,7 @@
                             <div class="space-y-2">
                                 <label for="price_range" class="block text-sm font-medium text-gray-700 flex items-center">
                                     <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path>
                                     </svg>
                                     Price Range
                                 </label>
@@ -209,48 +229,65 @@
                             <div class="space-y-4 mb-6">
                                 @if($service->trainer)
                                     <div class="flex flex-col gap-3">
-                                        <div class="flex items-center text-sm text-gray-600">
+                                        <div class="flex items-center justify-between text-sm text-gray-600">
                                             <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition duration-300" aria-label="Specialization: {{ $service->trainer->specialization }}">
                                                 {{ $service->trainer->specialization }}
+                                            </span>
+                                            
+                                            {{-- Improved price display --}}
+                                            <span class="text-base font-bold text-indigo-600">
+                                                LKR {{ number_format($service->price, 2) }}
                                             </span>
                                         </div>
                                         <!-- Location -->
                                         <div class="flex items-center text-sm text-gray-600" aria-label="Location: {{ $service->location }}">
-                                            <svg class="w-4 h-4 mr-1.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             </svg>
-                                            <span class="truncate">{{ $service->location }}</span>
+                                            {{ $service->location }}
+                                        </div>
+                                        
+                                        {{-- View Details Button --}}
+                                        <div class="mt-4">
+                                            <a href="{{ route('services.show', $service) }}" 
+                                               class="w-full inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-300 space-x-2 group">
+                                                <svg class="w-5 h-5 mr-2 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                View Service Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                    @endif
+                                </div>
+
+                                <!-- Book Now Button -->
+                                <a href="{{ route('bookings.create', ['service_id' => $service->id]) }}" 
+                                   class="inline-flex items-center px-4 py-2 bg-white border border-black rounded-md font-semibold text-xs text-black uppercase tracking-widest hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                   aria-label="Book {{ $service->service_name }} service now">
+                                    Book Now
+                                </a>
+                                @if($service->trainerService)
+                                    <div class="flex items-center justify-between mt-4">
+                                        <span class="text-lg font-bold text-primary">
+                                            ${{ number_format($service->trainerService->price, 2) }}
+                                        </span>
+                                        <div class="flex space-x-2">
+                                            <form action="{{ route('wishlist.store') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="service_id" value="{{ $service->trainerService->id }}">
+                                                <button type="submit" class="bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300 transition">
+                                                    <i class="fas fa-heart mr-1"></i> Add to Wishlist
+                                                </button>
+                                            </form>
+                                            <a href="{{ route('services.book', $service->trainerService->id) }}" class="bg-primary text-white px-3 py-1 rounded hover:bg-primary-dark transition">
+                                                Book Now
+                                            </a>
                                         </div>
                                     </div>
                                 @endif
                             </div>
-
-                            <!-- Book Now Button -->
-                            <a href="{{ route('bookings.create', ['service_id' => $service->id]) }}" 
-                               class="inline-flex items-center px-4 py-2 bg-white border border-black rounded-md font-semibold text-xs text-black uppercase tracking-widest hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150"
-                               aria-label="Book {{ $service->service_name }} service now">
-                                Book Now
-                            </a>
-                            @if($service->trainerService)
-                                <div class="flex items-center justify-between mt-4">
-                                    <span class="text-lg font-bold text-primary">
-                                        ${{ number_format($service->trainerService->price, 2) }}
-                                    </span>
-                                    <div class="flex space-x-2">
-                                        <form action="{{ route('wishlist.store') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="service_id" value="{{ $service->trainerService->id }}">
-                                            <button type="submit" class="bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300 transition">
-                                                <i class="fas fa-heart mr-1"></i> Add to Wishlist
-                                            </button>
-                                        </form>
-                                        <a href="{{ route('services.book', $service->trainerService->id) }}" class="bg-primary text-white px-3 py-1 rounded hover:bg-primary-dark transition">
-                                            Book Now
-                                        </a>
-                                    </div>
-                                </div>
-                            @endif
                         </div>
                     </div> 
                 @endforeach

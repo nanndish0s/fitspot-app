@@ -1,147 +1,224 @@
-<x-app-layout>
-    <div class="container mt-4">
-        <h1 class="text-2xl font-bold mb-4">Your Shopping Cart</h1>
+@extends('layouts.app')
 
-        @if ($cartItems->isEmpty())
-            <div class="alert alert-info text-center">
-                <p>Your cart is empty!</p>
-                <a href="{{ route('products.index') }}" class="btn btn-primary mt-3">Continue Shopping</a>
-            </div>
-        @else
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">
-                            Cart Items
-                        </div>
-                        <div class="card-body">
-                            @foreach ($cartItems as $cartItem)
-                                <div class="d-flex align-items-center border-bottom pb-3 mb-3">
-                                    <img src="{{ $cartItem->product->image ? asset('storage/'.$cartItem->product->image) : 'https://via.placeholder.com/100' }}" 
-                                         alt="{{ $cartItem->product->name }}" 
-                                         class="img-thumbnail me-3" 
-                                         style="max-width: 100px;">
-                                    
-                                    <div class="flex-grow-1">
-                                        <h5 class="mb-1">{{ $cartItem->product->name }}</h5>
-                                        <p class="text-muted mb-1">Price: LKR {{ number_format($cartItem->product->price, 2) }}</p>
-                                        
-                                        <form action="{{ route('cart.update', $cartItem->id) }}" method="POST" class="d-flex align-items-center">
-                                            @csrf
-                                            @method('PUT')
-                                            <div class="input-group" style="max-width: 150px;">
-                                                <button class="btn btn-outline-secondary quantity-decrease" type="button">-</button>
-                                                <input type="number" name="quantity" class="form-control text-center" 
-                                                       value="{{ $cartItem->quantity }}" 
-                                                       min="1" 
-                                                       max="{{ $cartItem->product->stock }}">
-                                                <button class="btn btn-outline-secondary quantity-increase" type="button">+</button>
-                                            </div>
-                                            <button type="submit" class="btn btn-sm btn-primary ms-2">Update</button>
-                                        </form>
-                                    </div>
-                                    
-                                    <form action="{{ route('cart.remove', $cartItem->id) }}" method="POST" class="ms-3">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                                    </form>
-                                </div>
-                            @endforeach
-                        </div>
+@section('content')
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto">
+        {{-- Flash Messages --}}
+        @if (session('success'))
+            <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-green-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-green-700">
+                            {{ session('success') }}
+                        </p>
                     </div>
                 </div>
-                
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            Order Summary
-                        </div>
-                        <div class="card-body">
-                            <p class="d-flex justify-content-between">
-                                <span>Subtotal:</span>
-                                <span>LKR {{ number_format($total, 2) }}</span>
-                            </p>
-                            <p class="d-flex justify-content-between">
-                                <span>Tax (10%):</span>
-                                <span>LKR {{ number_format($total * 0.1, 2) }}</span>
-                            </p>
-                            <hr>
-                            <p class="d-flex justify-content-between fw-bold">
-                                <span>Total:</span>
-                                <span>LKR {{ number_format($total * 1.1, 2) }}</span>
-                            </p>
-                            
-                            <form action="{{ route('checkout.session') }}" method="POST">
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700">
+                            {{ session('error') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Page Header --}}
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-800">Your Shopping Cart</h1>
+            <a href="{{ route('products.index') }}" class="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
+                <i class="fas fa-shopping-bag mr-2"></i>
+                Continue Shopping
+            </a>
+        </div>
+
+        @if ($cartItems->isEmpty())
+            <div class="text-center bg-white shadow-md rounded-lg p-12">
+                <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
+                <h2 class="text-2xl font-semibold text-gray-600 mb-4">Your cart is empty</h2>
+                <p class="text-gray-500 mb-6">Looks like you haven't added any items to your cart yet.</p>
+                <a href="{{ route('products.index') }}" class="inline-block bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-600 transition">
+                    Explore Products
+                </a>
+            </div>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {{-- Cart Items --}}
+                <div class="md:col-span-2 space-y-6">
+                    @foreach ($cartItems as $cartItem)
+                        <div class="bg-white shadow-md rounded-lg p-6 flex items-center space-x-6">
+                            {{-- Product Image --}}
+                            <img 
+                                src="{{ $cartItem->product->image ? Storage::url($cartItem->product->image) : asset('images/default-product.png') }}" 
+                                alt="{{ $cartItem->product->name }}" 
+                                class="w-24 h-24 object-cover rounded-md"
+                            >
+
+                            {{-- Product Details --}}
+                            <div class="flex-grow">
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $cartItem->product->name }}</h3>
+                                <p class="text-gray-600 mb-4">LKR {{ number_format($cartItem->product->price, 2) }}</p>
+
+                                {{-- Quantity Selector --}}
+                                <form 
+                                    action="{{ route('cart.update', $cartItem->id) }}" 
+                                    method="POST" 
+                                    class="flex items-center space-x-4"
+                                    x-data="quantityManager({{ $cartItem->quantity }}, {{ $cartItem->product->quantity }})"
+                                >
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="flex items-center border rounded-md">
+                                        <button 
+                                            type="button" 
+                                            @click="decreaseQuantity"
+                                            class="px-3 py-1 text-gray-600 hover:bg-gray-100"
+                                        >-</button>
+                                        <input 
+                                            type="number" 
+                                            name="quantity" 
+                                            x-model="quantity"
+                                            min="1" 
+                                            max="{{ $cartItem->product->quantity }}"
+                                            class="w-16 text-center border-none focus:ring-0"
+                                        >
+                                        <button 
+                                            type="button" 
+                                            @click="increaseQuantity"
+                                            class="px-3 py-1 text-gray-600 hover:bg-gray-100"
+                                        >+</button>
+                                    </div>
+                                    <button 
+                                        type="submit" 
+                                        class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+                                    >
+                                        Update
+                                    </button>
+                                </form>
+                            </div>
+
+                            {{-- Remove Button --}}
+                            <form 
+                                action="{{ route('cart.remove', ['cartItem' => $cartItem->id]) }}" 
+                                method="POST" 
+                                class="ml-4"
+                            >
                                 @csrf
-                                <button type="submit" class="btn btn-success w-100 mt-3">
-                                    Proceed to Checkout
+                                @method('DELETE')
+                                <button 
+                                    type="submit" 
+                                    class="text-red-500 hover:text-red-700 transition flex items-center"
+                                    onclick="return confirm('Are you sure you want to remove this item from your cart?');"
+                                >
+                                    <i class="fas fa-trash mr-2"></i>
+                                    Remove
                                 </button>
                             </form>
                         </div>
+                    @endforeach
+                </div>
+
+                {{-- Order Summary --}}
+                <div>
+                    <div class="bg-white shadow-md rounded-lg p-6 sticky top-24">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6">Order Summary</h3>
+                        
+                        <div class="space-y-4 mb-6">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Subtotal</span>
+                                <span class="font-semibold">LKR {{ number_format($total, 2) }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Tax (10%)</span>
+                                <span class="font-semibold">LKR {{ number_format($total * 0.1, 2) }}</span>
+                            </div>
+                            <hr class="border-gray-200">
+                            <div class="flex justify-between text-xl font-bold">
+                                <span>Total</span>
+                                <span>LKR {{ number_format($total * 1.1, 2) }}</span>
+                            </div>
+                        </div>
+
+                        <form action="{{ route('checkout.session') }}" method="POST">
+                            @csrf
+                            <button 
+                                type="submit" 
+                                class="w-full bg-green-500 text-white py-3 rounded-md hover:bg-green-600 transition"
+                            >
+                                Proceed to Checkout
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         @endif
     </div>
+</div>
 
-    @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const quantityInputs = document.querySelectorAll('input[name="quantity"]');
-            
-            quantityInputs.forEach(input => {
-                const decreaseBtn = input.previousElementSibling;
-                const increaseBtn = input.nextElementSibling;
-                
-                decreaseBtn.addEventListener('click', function() {
-                    let currentValue = parseInt(input.value);
-                    if (currentValue > 1) {
-                        input.value = currentValue - 1;
-                    }
-                });
-                
-                increaseBtn.addEventListener('click', function() {
-                    let currentValue = parseInt(input.value);
-                    let maxValue = parseInt(input.getAttribute('max'));
-                    if (currentValue < maxValue) {
-                        input.value = currentValue + 1;
-                    }
-                });
-            });
-        });
-    </script>
-    @endpush
-
-    <footer class="bg-dark text-white py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5>FitSpot</h5>
-                    <p>Your ultimate destination for fitness and wellness.</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{{ route('services.index') }}" class="text-white-50">Services</a></li>
-                        <li><a href="{{ route('products.index') }}" class="text-white-50">Products</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5>Connect With Us</h5>
-                    <div class="social-links">
-                        <a href="#" class="text-white-50 me-3"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-white-50 me-3"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-white-50"><i class="fab fa-twitter"></i></a>
-                    </div>
-                </div>
+<div class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>FitSpot</h5>
+                <p>Your ultimate destination for fitness and wellness.</p>
             </div>
-            <hr class="my-4 bg-white">
-            <div class="text-center">
-                <p>&copy; 2024 FitSpot. All Rights Reserved.</p>
+            <div class="col-md-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{{ route('services.index') }}" class="text-white-50">Services</a></li>
+                    <li><a href="{{ route('products.index') }}" class="text-white-50">Products</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Connect With Us</h5>
+                <div class="social-links">
+                    <a href="#" class="text-white-50 me-3"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-white-50 me-3"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white-50"><i class="fab fa-twitter"></i></a>
+                </div>
             </div>
         </div>
-    </footer>
+        <hr class="my-4 bg-white">
+        <div class="text-center">
+            <p>&copy; 2024 FitSpot. All Rights Reserved.</p>
+        </div>
+    </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</x-app-layout>
+@endsection
+
+@push('scripts')
+<script>
+    function quantityManager(initialQuantity, maxQuantity) {
+        return {
+            quantity: initialQuantity,
+            maxQuantity: maxQuantity,
+            
+            increaseQuantity() {
+                if (this.quantity < this.maxQuantity) {
+                    this.quantity++;
+                }
+            },
+            
+            decreaseQuantity() {
+                if (this.quantity > 1) {
+                    this.quantity--;
+                }
+            }
+        }
+    }
+</script>
+@endpush
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

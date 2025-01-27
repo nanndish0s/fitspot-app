@@ -52,7 +52,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
 
     Route::get('/seller/dashboard', [SellerController::class, 'index'])->name('seller.dashboard');
-
 });
 
 Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
@@ -145,8 +144,6 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/trainer/bookings/clear-cancelled', [BookingController::class, 'clearCancelledBookings'])->name('trainer.bookings.clear-cancelled');
 });
 
-Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
-
 // Gym routes
 Route::get('/gyms/nearby', [GymController::class, 'index'])->name('gyms.nearby');
 Route::get('/nearby-gyms', [GymController::class, 'nearbyGyms'])->name('gyms.nearby.data');
@@ -164,6 +161,21 @@ Route::prefix('forum')->name('forum.')->group(function () {
     Route::post('/{postId}/comment', [ForumController::class, 'addComment'])->name('comment')->middleware('auth');
     Route::post('/{postId}/like', [ForumController::class, 'toggleLike'])->name('like')->middleware('auth');
     Route::delete('/{id}', [ForumController::class, 'destroy'])->name('destroy')->middleware('auth');
+});
+
+Route::middleware(['auth'])->group(function () {
+    // Seller-specific routes
+    Route::get('/seller/products', [ProductController::class, 'sellerIndex'])->name('seller.products');
+    Route::get('/seller/orders', [SellerController::class, 'sellerOrders'])->name('seller.orders');
+
+    // Product CRUD routes
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{product}', [ProductController::class, 'destroySeller'])->name('products.destroy');
+
+    Route::get('/seller/dashboard', [SellerController::class, 'index'])->name('seller.dashboard');
 });
 
 require __DIR__.'/auth.php';

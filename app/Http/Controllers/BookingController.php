@@ -58,6 +58,20 @@ class BookingController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
+        // Check for existing bookings
+        $existingBooking = Booking::where('trainer_id', TrainerService::findOrFail($validated['service_id'])->trainer_id)
+            ->where('service_id', $validated['service_id'])
+            ->where('session_date', $validated['session_date'])
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->first();
+
+        if ($existingBooking) {
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'This time slot is already booked. Please choose a different time.'
+            ], 422);
+        }
+
         // Store booking details in session
         session([
             'booking_service_id' => $validated['service_id'],

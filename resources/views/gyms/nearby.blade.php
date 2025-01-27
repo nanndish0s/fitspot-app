@@ -1,8 +1,23 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Nearby Gyms in Colombo
-        </h2>
+        <div class="bg-gradient-to-br from-green-600 to-teal-700 text-white py-16">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto text-center">
+                    <div class="flex justify-center mb-6">
+                        <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 21v-4m0 0H1v4h2zM5 3a2 2 0 100 4 2 2 0 000-4zM5 5v12m14-8a2 2 0 100 4 2 2 0 000-4zm0 0V5m0 12h2v-4h-2z"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+                        Discover Your Ideal Fitness Destination
+                    </h1>
+                    <p class="text-xl md:text-2xl mb-6 text-white/90 leading-relaxed">
+                        Find the perfect gym near you. From state-of-the-art facilities to specialized training spaces, 
+                        your fitness journey starts here.
+                    </p>
+                </div>
+            </div>
+        </div>
     </x-slot>
 
     <!-- Styles -->
@@ -330,3 +345,35 @@
         document.addEventListener('DOMContentLoaded', initMap);
     </script>
 </x-app-layout>
+
+<footer class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>FitSpot</h5>
+                <p>Your ultimate destination for fitness and wellness.</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{{ route('services.index') }}" class="text-white-50">Services</a></li>
+                    <li><a href="{{ route('products.index') }}" class="text-white-50">Products</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Connect With Us</h5>
+                <div class="social-links">
+                    <a href="#" class="text-white-50 me-3"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-white-50 me-3"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white-50"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4 bg-white">
+        <div class="text-center">
+            <p>&copy; 2024 FitSpot. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

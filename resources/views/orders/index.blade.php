@@ -1,64 +1,118 @@
 <x-app-layout>
-    <!-- Page Title Section -->
-    <section class="bg-gray-800 text-white text-center py-20">
-        <div class="container mx-auto">
-            <h2 class="text-4xl font-bold">My Orders</h2>
-            <p class="mt-4 text-xl">View your order history</p>
-        </div>
-    </section>
+    <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            {{-- Page Header --}}
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg shadow-lg mb-10 p-8">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h1 class="text-4xl font-extrabold mb-4">My Orders</h1>
+                    <p class="text-xl text-indigo-100">Track and manage your recent purchases</p>
+                </div>
+            </div>
 
-    <!-- Orders Section -->
-    <section class="container mx-auto py-20 px-4 flex-grow">
-        @if ($orders->isEmpty())
-            <p class="text-center text-xl">You have no orders yet.</p>
-        @else
-            <div class="space-y-6">
-                @foreach ($orders as $order)
-                    <div class="bg-white shadow-md rounded-lg p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-2xl font-semibold">Order #{{ $order->id }}</h3>
-                            <span class="text-sm px-3 py-1 rounded 
-                                @if ($order->status == 'pending') bg-yellow-200 text-yellow-800
-                                @elseif ($order->status == 'completed') bg-green-200 text-green-800
-                                @else bg-red-200 text-red-800
-                                @endif">
-                                {{ ucfirst($order->status) }}
-                            </span>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <p class="text-gray-600">Ordered on: {{ $order->created_at->format('F d, Y') }}</p>
-                            <p class="text-xl font-bold">Total: LKR {{ number_format($order->total_amount, 2) }}</p>
-                        </div>
+            {{-- Orders Container --}}
+            <div class="space-y-8">
+                @if ($orders->isEmpty())
+                    <div class="bg-white rounded-lg shadow-md p-10 text-center">
+                        <i class="fas fa-shopping-bag text-6xl text-gray-300 mb-6"></i>
+                        <h2 class="text-2xl font-semibold text-gray-600 mb-4">No Orders Yet</h2>
+                        <p class="text-gray-500 mb-6">Looks like you haven't made any purchases.</p>
+                        <a href="{{ route('products.index') }}" class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition">
+                            Start Shopping
+                        </a>
+                    </div>
+                @else
+                    @foreach ($orders as $order)
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                            {{-- Order Header --}}
+                            <div class="bg-gray-100 px-6 py-4 flex justify-between items-center border-b">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-800">Order #{{ $order->id }}</h3>
+                                    <p class="text-sm text-gray-500">
+                                        Placed on {{ $order->created_at->format('F d, Y') }}
+                                    </p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold 
+                                    @if ($order->status == 'pending') bg-yellow-100 text-yellow-800
+                                    @elseif ($order->status == 'completed') bg-green-100 text-green-800
+                                    @elseif ($order->status == 'cancelled') bg-red-100 text-red-800
+                                    @else bg-gray-100 text-gray-800
+                                    @endif">
+                                    {{ ucfirst($order->status) }}
+                                </span>
+                            </div>
 
-                        <div class="border-t pt-4">
-                            <h4 class="text-lg font-semibold mb-2">Order Items</h4>
-                            <div class="space-y-2">
-                                @foreach ($order->orderItems as $item)
-                                    <div class="flex justify-between items-center">
-                                        <div class="flex items-center">
-                                            @if ($item->product->image)
-                                                <img src="{{ asset('storage/'.$item->product->image) }}" alt="{{ $item->product->name }}" class="w-16 h-16 object-cover rounded-md mr-4">
-                                            @else
-                                                <img src="https://via.placeholder.com/150" alt="{{ $item->product->name }}" class="w-16 h-16 object-cover rounded-md mr-4">
-                                            @endif
-                                            <div>
-                                                <p class="font-semibold">{{ $item->product->name }}</p>
-                                                <p class="text-gray-600">Quantity: {{ $item->quantity }}</p>
+                            {{-- Order Details --}}
+                            <div class="p-6">
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    {{-- Order Items --}}
+                                    <div>
+                                        <h4 class="text-lg font-semibold mb-4 text-gray-700">Order Items</h4>
+                                        <div class="space-y-4">
+                                            @foreach ($order->orderItems as $item)
+                                                <div class="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg">
+                                                    <div class="flex-shrink-0">
+                                                        @if ($item->product->image)
+                                                            <img 
+                                                                src="{{ asset('storage/'.$item->product->image) }}" 
+                                                                alt="{{ $item->product->name }}" 
+                                                                class="w-20 h-20 object-cover rounded-md"
+                                                            >
+                                                        @else
+                                                            <div class="w-20 h-20 bg-gray-200 rounded-md flex items-center justify-center">
+                                                                <i class="fas fa-image text-gray-400"></i>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    <div class="flex-1">
+                                                        <h5 class="font-semibold text-gray-800">{{ $item->product->name }}</h5>
+                                                        <p class="text-sm text-gray-600">
+                                                            Quantity: {{ $item->quantity }} 
+                                                            | Price: LKR {{ number_format($item->price, 2) }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    {{-- Order Summary --}}
+                                    <div>
+                                        <h4 class="text-lg font-semibold mb-4 text-gray-700">Order Summary</h4>
+                                        <div class="bg-gray-50 p-6 rounded-lg space-y-3">
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-600">Subtotal</span>
+                                                <span class="font-semibold">LKR {{ number_format($order->subtotal, 2) }}</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-600">Tax</span>
+                                                <span class="font-semibold">LKR {{ number_format($order->tax, 2) }}</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-600">Shipping</span>
+                                                <span class="font-semibold">LKR {{ number_format($order->shipping, 2) }}</span>
+                                            </div>
+                                            <hr class="border-gray-200">
+                                            <div class="flex justify-between text-xl font-bold text-gray-800">
+                                                <span>Total</span>
+                                                <span>LKR {{ number_format($order->total_amount, 2) }}</span>
                                             </div>
                                         </div>
-                                        <p class="font-bold">LKR {{ number_format($item->price, 2) }}</p>
                                     </div>
-                                @endforeach
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
-        @endif
-    </section>
+                    @endforeach
 
-    <footer class="bg-dark text-white py-5">
+                    {{-- Pagination --}}
+                    <div class="mt-8">
+                        {{ $orders->links() }}
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-dark text-white py-5">
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
@@ -86,7 +140,5 @@
                 <p>&copy; 2024 FitSpot. All Rights Reserved.</p>
             </div>
         </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
 </x-app-layout>

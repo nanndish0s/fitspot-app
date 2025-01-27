@@ -88,6 +88,7 @@
     @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize date picker
@@ -95,17 +96,14 @@
                 enableTime: true,
                 dateFormat: "Y-m-d H:i",
                 minDate: "today",
-                time_24hr: false,
-                minuteIncrement: 30,
-                defaultHour: 9,
-                minTime: "06:00",
-                maxTime: "22:00",
-                onChange: function(selectedDates, dateStr) {
+                onChange: function(selectedDates, dateStr, instance) {
+                    // Set the hidden input value
                     document.getElementById('session_date').value = dateStr;
                 }
             });
 
-            // Initialize Stripe
+            // Payment form submission
+            const form = document.getElementById('payment-form');
             const stripe = Stripe('{{ config('services.stripe.key') }}');
             const clientSecret = '{{ $clientSecret }}';
 
@@ -121,58 +119,69 @@
             const paymentElement = elements.create('payment');
             paymentElement.mount('#payment-element');
 
-            // Handle form submission
-            const form = document.getElementById('payment-form');
-            const submitButton = document.getElementById('submit-button');
-            const paymentMessage = document.getElementById('payment-message');
-
-            form.addEventListener('submit', async (event) => {
+            form.addEventListener('submit', async function(event) {
                 event.preventDefault();
-
-                // Validate the session date
+                
+                // Validate session date
                 const sessionDate = document.getElementById('session_date').value;
                 if (!sessionDate) {
-                    paymentMessage.textContent = 'Please select a session date';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Please select a session date and time.'
+                    });
                     return;
                 }
-                
-                // Disable submit button and show loading state
-                submitButton.disabled = true;
-                submitButton.textContent = 'Processing...';
-                paymentMessage.textContent = '';
-                
+
+                // First, validate and store booking details
                 try {
-                    // Submit the form data first
-                    const formData = new FormData(form);
-                    const response = await fetch(form.action, {
+                    const response = await fetch('{{ route('bookings.store') }}', {
                         method: 'POST',
-                        body: formData,
                         headers: {
-                            'Accept': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        }
+                        },
+                        body: JSON.stringify({
+                            service_id: '{{ $service->id }}',
+                            session_date: sessionDate,
+                            notes: document.getElementById('notes')?.value || ''
+                        })
                     });
 
-                    if (!response.ok) {
-                        throw new Error('Failed to submit booking details');
+                    const data = await response.json();
+
+                    if (data.status === 'error') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Booking Unavailable',
+                            text: data.message
+                        });
+                        return;
                     }
 
-                    // Confirm the payment
+                    // Proceed with payment if booking details are valid
                     const {error} = await stripe.confirmPayment({
                         elements,
                         confirmParams: {
-                            return_url: window.location.origin + '/bookings/payment-complete',
+                            return_url: '{{ route('bookings.payment-complete') }}'
                         }
                     });
 
                     if (error) {
-                        throw error;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Payment Error',
+                            text: error.message
+                        });
                     }
+
                 } catch (error) {
-                    paymentMessage.textContent = error.message;
-                    submitButton.disabled = false;
-                    submitButton.textContent = 'Book Session';
+                    console.error('Booking validation error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An unexpected error occurred. Please try again.'
+                    });
                 }
             });
         });
